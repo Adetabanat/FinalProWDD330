@@ -1,9 +1,22 @@
 import express from "express";
-import { getBooks, getQuote } from "../controllers/apiController.js";
+import {
+  searchBooks,
+  getBookDetails,
+  getCategoryBooks
+} from "../controllers/apiController.js";
 
 const router = express.Router();
 
-router.get("/books", getBooks);
-router.get("/quote", getQuote);
+// Search across Google Books + Gutendex
+router.get("/books", searchBooks);
+
+// Single book details
+router.get("/book", getBookDetails);
+
+// Category listing (convenience wrapper)
+router.get("/categories", getCategoryBooks);
+
+// Quote
+
 
 export default router;
