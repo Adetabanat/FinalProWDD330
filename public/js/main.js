@@ -1,4 +1,3 @@
-// src/js/main.js
 import {
   loadHeaderFooter,
   getLocalStorage,
@@ -24,13 +23,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     quoteContainer.innerHTML = `<span class="scrolling-quote">"${quote.content}" - ${quote.author}</span>`;
   }
 
-  // Render book sections with max 4 books each
+  // Render book sections (limit 4 books per section)
   await renderBooksSection("recommended-books", "bestsellers", 4);
   await renderBooksSection("trending-books", "technology", 4);
   await renderGutendexSection("gutendex-books", "fiction", 4);
-
-  // Render favorites section (optional)
-  renderFavoritesSection("favorite-books");
 
   // Update header counts
   updateHeaderCounts();
@@ -38,12 +34,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- Functions ---
 
-// Render Google Books section
-async function renderBooksSection(containerId, query, maxResults = 4) {
+async function renderBooksSection(containerId, query, limit = 4) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const books = await searchBooks(query, maxResults);
+  const books = await searchBooks(query, limit);
   container.innerHTML = books
     .map(book => {
       const bookId = book.id;
@@ -73,12 +68,11 @@ async function renderBooksSection(containerId, query, maxResults = 4) {
   addFavoritesButtons(container);
 }
 
-// Render Gutendex eBooks section
-async function renderGutendexSection(containerId, subject, maxResults = 4) {
+async function renderGutendexSection(containerId, subject, limit = 4) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  const books = await fetchGutendexBooks(subject, maxResults);
+  const books = await fetchGutendexBooks(subject, limit);
   if (!books || books.length === 0) {
     container.innerHTML = "<p>No free eBooks found.</p>";
     return;
@@ -106,44 +100,13 @@ async function renderGutendexSection(containerId, subject, maxResults = 4) {
   addFavoritesButtons(container);
 }
 
-// Render favorites section
-function renderFavoritesSection(containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  const favorites = getLocalStorage("favorites");
-  if (!favorites || favorites.length === 0) {
-    container.innerHTML = "<p>No favorite books yet.</p>";
-    return;
-  }
-
-  container.innerHTML = favorites
-    .map(book => {
-      const title = book.title || "No Title";
-      const author = book.author || "Unknown";
-      const thumbnail = book.image || "https://via.placeholder.com/128x195";
-
-      return `
-        <div class="book-card">
-          <a href="../book-detail.html?id=${book.id}">
-            <img src="${thumbnail}" alt="${title}">
-            <h4>${title}</h4>
-            <p>${author}</p>
-          </a>
-        </div>
-      `;
-    })
-    .join("");
-}
-
-// Utility: add favorite button functionality to a container
 function addFavoritesButtons(container) {
   container.querySelectorAll(".add-favorite").forEach(btn => {
     btn.addEventListener("click", () => {
       const favorites = getLocalStorage("favorites");
       const id = btn.dataset.id;
 
-      if (!favorites.some(f => f.id == id)) {
+      if (!favorites.some(f => f.id === id)) {
         favorites.push({
           id,
           title: btn.dataset.title,
@@ -153,7 +116,6 @@ function addFavoritesButtons(container) {
         setLocalStorage("favorites", favorites);
         alert("Book added to favorites!");
         updateHeaderCounts();
-        renderFavoritesSection("favorite-books");
       } else {
         alert("Book already in favorites.");
       }
