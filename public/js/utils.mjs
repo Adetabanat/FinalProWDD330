@@ -44,7 +44,7 @@ export function setupSearchHandler() {
 
 // Update header counts for favorites & cart
 export function updateHeaderCounts() {
-  const favoritesEl = document.querySelector(".favorites-count");
+  const favoritesEl = document.getElementById("favorites-count"); // <- changed
   const cartEl = document.getElementById("cart-count");
 
   if (favoritesEl) favoritesEl.textContent = getLocalStorage("favorites").length;
